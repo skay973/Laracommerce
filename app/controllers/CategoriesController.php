@@ -1,45 +1,51 @@
 <?php
 
+use Gateways\CategoryGateway as Category;
+
 class CategoriesController extends BaseController {
 
-	public function __construct() {
+	protected $category;
+
+	public function __construct(Category $category) {
 		parent::__construct();
+
+		$this->category = $category;
+
 		$this->beforeFilter('csrf', array('on'=>'post'));
 		$this->beforeFilter('admin');
 	}
 
 	public function getIndex() {
+
+		$categories = $this->category->getAllCategories(false);
+
 		return View::make('categories.index')
-			->with('categories', Category::all());
+			->with('categories', $categories);
 	}
 
 	public function postCreate() {
-		$validator = Validator::make(Input::all(), Category::$rules);
+		$data = $this->category->createCategory(Input::all());
 
-		if ($validator->passes()) {
-			$category = new Category;
-			$category->name = Input::get('name');
-			$category->save();
-
+		if(!$data['success']) {
 			return Redirect::to('admin/categories/index')
-				->with('success', 'Category Created');
+				->withErrors($data['message'])
+				->withInput();
 		}
 
 		return Redirect::to('admin/categories/index')
-			->withErrors($validator)
-			->withInput();
+			->with('success', 'Categorie crée');
 	}
 
 	public function postDestroy() {
-		$category = Category::find(Input::get('id'));
+		$data = $this->category->deleteCategory(Input::get('id'));
 
-		if ($category) {
-			$category->delete();
+		if(!$data['success']) {
 			return Redirect::to('admin/categories/index')
-				->with('success', 'Category Deleted');
+				->with('error', 'Une erreur s\'est produite, veuillez réessayer');
 		}
 
 		return Redirect::to('admin/categories/index')
-			->with('error', 'Something went wrong, please try again');
+			->with('success', 'Catégorie supprimée');
+
 	}
 }

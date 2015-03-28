@@ -121,8 +121,11 @@ return array(
 		'Illuminate\Validation\ValidationServiceProvider',
 		'Illuminate\View\ViewServiceProvider',
 		'Illuminate\Workbench\WorkbenchServiceProvider',
+		// contrib providers
 		'Intervention\Image\ImageServiceProvider',
-		'Moltin\Cart\CartServiceProvider'
+		'Moltin\Cart\CartServiceProvider',
+		// custom providers
+		'Repositories\RepositoriesServiceProvider'
 
 	),
 
